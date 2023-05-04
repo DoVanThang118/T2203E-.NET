@@ -5,10 +5,22 @@ namespace T2203E_demo.Controllers
 {
     public class ProductController : Controller
     {
-        public IActionResult Index()
+        private readonly DataContext _context;
+        public ProductController(DataContext context)
         {
-            DataContext context = new DataContext();
-            return View(context);
+            _context = context;
+        }
+        public async Task<IActionResult> Index()
+        {
+            List<Product> list = _context.Products.ToList<Product>();
+            ViewBag.Products = list;
+            return View();
+        }
+
+        public IActionResult Edit(int Id)
+        {
+            var product = _context.Products.FindAsync(Id);
+            return View(product);
         }
     }
 }

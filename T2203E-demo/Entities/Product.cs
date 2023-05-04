@@ -13,7 +13,7 @@ namespace T2203E_demo.Entities
         public string Name { get; set; }
 
         [Required]
-        public decimal Price { get; set; }
+        public double Price { get; set; }
 
         [StringLength(255)]
         [Required]
