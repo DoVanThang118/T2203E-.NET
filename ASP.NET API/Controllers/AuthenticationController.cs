@@ -6,6 +6,12 @@ using BCrypt.Net;
 using ASP.NET_API.Dto;
 using ASP.NET_API.Entities;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using System.Security.Claims;
+
 
 namespace t22netapi.Controllers
 {
@@ -14,11 +20,12 @@ namespace t22netapi.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly AspNetApiContext _context;
-        public AuthenticationController(AspNetApiContext context)
+        private readonly IConfiguration _config;
+        public AuthenticationController(AspNetApiContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
-
 
         [HttpPost]
         [Route("/register")]
@@ -31,18 +38,18 @@ namespace t22netapi.Controllers
             return Ok(new UserData { Name = user.Name, Email = user.Email });
         }
 
+
+
         [HttpPost]
         [Route("/login")]
         public IActionResult Login(string email, string passwordHash)
         {
-            var user = _context.Users.Where(u=> u.Email == email).FirstOrDefault();
+            var user = _context.Users.Where(u => u.Email == email).First();
             if (user == null) return NotFound();
-            bool verified = BCrypt.Net.BCrypt.Verify("Pa$$w0rd", passwordHash);
-            if (verified)
-            {
-                return BadRequest();
-            }
-            return Ok(user);
+            bool verified = BCrypt.Net.BCrypt.Verify(passwordHash, user.Password);
+            if (!verified) return NotFound();
+
+            return Ok(new UserData { Name = user.Name, Email = user.Email });
         }
 
     }
