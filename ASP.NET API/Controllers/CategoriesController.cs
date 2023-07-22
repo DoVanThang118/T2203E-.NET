@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ASP.NET_API.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ASP.NET_API.Controllers
 {
     [Route("api/categories")]
     [ApiController]
+    [Authorize(Policy = "ValidYearOld")]
     public class CategoriesController : ControllerBase
     {
         private readonly AspNetApiContext _context;
@@ -22,11 +24,13 @@ namespace ASP.NET_API.Controllers
 
         // GET: api/Categories
         [HttpGet]
+        //[Authorize(Policy = "ValidYearOld")]
+        [AllowAnonymous]
         public IActionResult index()
         {
             var products = _context.Categories.ToList<Category>();
             return Ok(products);
-        }
+        }   
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
